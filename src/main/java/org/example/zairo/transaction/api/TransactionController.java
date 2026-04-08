@@ -16,7 +16,7 @@ import org.example.zairo.transaction.application.dto.TransactionFilterRequest;
 import org.example.zairo.transaction.application.dto.TransactionRequest;
 import org.example.zairo.transaction.application.dto.TransactionResponse;
 import org.example.zairo.transaction.application.service.TransactionService;
-import org.example.zairo.transaction.infrastrucutre.export.TransactionExportService;
+import org.example.zairo.transaction.infrastructure.export.TransactionExportService;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

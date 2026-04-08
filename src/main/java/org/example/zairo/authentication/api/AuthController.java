@@ -48,6 +48,7 @@ public class AuthController {
                 authService.getTeamMembersInWorkspace(authentication)
         );
     }
+    @Operation(summary = "Update workspace users credentials")
     @PutMapping("/{userId}")
     @PreAuthorize("hasAnyAuthority('ROLE_ORGANIZER', 'ROLE_ADMIN')")
     public ResponseEntity<String> updateUser(
@@ -59,6 +60,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Delete workspace user")
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasAnyAuthority('ROLE_ORGANIZER', 'ROLE_ADMIN')")
     public ResponseEntity<String> deleteUser(

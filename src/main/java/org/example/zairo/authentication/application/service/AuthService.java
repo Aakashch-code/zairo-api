@@ -2,6 +2,10 @@ package org.example.zairo.authentication.application.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.zairo.authentication.application.dto.*;
+import org.example.zairo.authentication.application.exception.BadRequestException;
+import org.example.zairo.authentication.application.exception.ForbiddenException;
+import org.example.zairo.authentication.application.exception.NotFoundException;
+import org.example.zairo.authentication.application.exception.UnauthorizedException;
 import org.example.zairo.authentication.domain.model.FinanceWorkspace;
 import org.example.zairo.authentication.domain.model.Users;
 import org.example.zairo.authentication.domain.model.UsersRole;
@@ -13,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,18 +32,19 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final FinanceWorkspaceRepository workspaceRepository;
 
+    @Transactional
     public String register(RegisterRequest request) {
 
         if (repo.existsByUsername(request.getUsername())
                 || repo.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Username or email already exists");
+            throw new BadRequestException("Credentials are already used");
         }
 
         FinanceWorkspace workspace;
 
         if (request.getRole() == UsersRole.ORGANIZER) {
             if (request.getWorkspaceName() == null || request.getWorkspaceName().isEmpty()) {
-                throw new RuntimeException("Workspace name required");
+                throw new BadRequestException("Workspace name required");
             }
 
             workspace = new FinanceWorkspace();
@@ -48,7 +54,7 @@ public class AuthService {
 
         } else {
             workspace = workspaceRepository.findByInviteCode(request.getInviteCode())
-                    .orElseThrow(() -> new RuntimeException("Invalid invite code"));
+                    .orElseThrow(() -> new BadRequestException("Invalid invite code"));
         }
 
         Users user = new Users(
@@ -79,7 +85,7 @@ public class AuthService {
         );
 
         Users user = repo.findByUsernameOrEmail(request.getLogin())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         String token = jwtUtil.generateToken(user.getId(), user.getRole().toString());
 
@@ -91,47 +97,47 @@ public class AuthService {
         UUID userId = UUID.fromString(authentication.getName());
 
         Users currentUser = repo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         if (currentUser.getWorkspace() == null) {
-            throw new IllegalStateException("User does not belong to a workspace.");
+            throw new NotFoundException("User does not belong to a workspace.");
         }
 
         return repo.findUserSummariesByWorkspaceId(currentUser.getWorkspace().getId());
     }
-
+    @Transactional
     public String deleteUser(UUID targetUserId, Authentication authentication) {
         UUID currentUserId = UUID.fromString(authentication.getName());
         Users currentUser = repo.findById(currentUserId)
-                .orElseThrow(() -> new RuntimeException("Current user not found"));
+                .orElseThrow(() -> new NotFoundException("Current user not found"));
 
         Users targetUser = repo.findById(targetUserId)
-                .orElseThrow(() -> new RuntimeException("User to delete not found"));
+                .orElseThrow(() -> new NotFoundException("User to delete not found"));
 
         if (currentUser.getRole() == UsersRole.ORGANIZER) {
             if (!currentUser.getWorkspace().getId().equals(targetUser.getWorkspace().getId())) {
-                throw new RuntimeException("Unauthorized: Cannot delete users outside your workspace");
+                throw new ForbiddenException("Forbidden: Cannot delete users outside your workspace");
             }
             if (currentUser.getId().equals(targetUser.getId())) {
-                throw new RuntimeException("Action not allowed: Cannot delete your own organizer account");
+                throw new ForbiddenException("Action not allowed: Cannot delete your own organizer account");
             }
         }
 
         repo.delete(targetUser);
         return "User deleted successfully";
     }
-
+    @Transactional
     public String updateUser(UUID targetUserId, UpdateUserRequest request, Authentication authentication) {
         UUID currentUserId = UUID.fromString(authentication.getName());
         Users currentUser = repo.findById(currentUserId)
-                .orElseThrow(() -> new RuntimeException("Current user not found"));
+                .orElseThrow(() -> new NotFoundException("Current user not found"));
 
         Users targetUser = repo.findById(targetUserId)
-                .orElseThrow(() -> new RuntimeException("User to update not found"));
+                .orElseThrow(() -> new NotFoundException("User to update not found"));
 
         if (currentUser.getRole() == UsersRole.ORGANIZER) {
             if (!currentUser.getWorkspace().getId().equals(targetUser.getWorkspace().getId())) {
-                throw new RuntimeException("Unauthorized: Cannot update users outside your workspace");
+                throw new ForbiddenException("Forbidden: Cannot update users outside your workspace");
             }
         }
 

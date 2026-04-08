@@ -1,4 +1,4 @@
-package org.example.zairo.transaction.infrastrucutre.mapper;
+package org.example.zairo.transaction.infrastructure.mapper;
 
 import org.example.zairo.transaction.application.dto.*;
 import org.mapstruct.*;

@@ -13,11 +13,10 @@ import org.example.zairo.transaction.domain.exception.ResourceNotFoundException;
 import org.example.zairo.transaction.domain.model.Transaction;
 import org.example.zairo.transaction.domain.model.TransactionType;
 import org.example.zairo.transaction.domain.validator.TransactionValidator;
-import org.example.zairo.transaction.infrastrucutre.mapper.TransactionMapper;
-import org.example.zairo.transaction.infrastrucutre.persistence.TransactionRepository;
+import org.example.zairo.transaction.infrastructure.mapper.TransactionMapper;
+import org.example.zairo.transaction.infrastructure.persistence.TransactionRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

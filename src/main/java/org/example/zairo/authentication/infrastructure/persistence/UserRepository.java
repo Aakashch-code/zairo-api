@@ -21,17 +21,8 @@ public interface UserRepository extends JpaRepository<Users, UUID> {
     Optional<Users> findByUsernameOrEmail(@Param("login") String login);
 
     @Query("""
-    SELECT new org.example.zairo.authentication.application.dto.UserSummaryDTO(
-        u.username,
-        u.email,
-        u.role
-    )
-    FROM Users u
-""")
-    List<UserSummaryDTO> findAllUserSummaries();
-
-    @Query("""
         SELECT new org.example.zairo.authentication.application.dto.UserSummaryDTO(
+            u.id,
             u.username,
             u.email,
             u.role

@@ -1,4 +1,4 @@
-package org.example.zairo.transaction.infrastrucutre.persistence;
+package org.example.zairo.transaction.infrastructure.persistence;
 
 import org.example.zairo.transaction.domain.model.Transaction;
 import org.example.zairo.transaction.domain.model.TransactionType;

@@ -83,7 +83,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-                "https://intelli-wealth-ui.netlify.app",
+                "https://zairo-ui.netlify.app/",
                 "http://localhost:5173"
         ));
         configuration.setAllowedMethods(List.of(

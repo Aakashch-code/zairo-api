@@ -83,7 +83,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-                "https://zairo-ui.netlify.app/",
+                "https://zairo-ui.netlify.app",
                 "http://localhost:5173"
         ));
         configuration.setAllowedMethods(List.of(
@@ -98,6 +98,5 @@ public class SecurityConfig {
 
         return source;
     }
-
 
 }

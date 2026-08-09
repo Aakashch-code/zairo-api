@@ -112,7 +112,7 @@ public class TransactionService extends SecuredService {
     }
 
     private FinanceWorkspace getCurrentUserWorkspace() {
-        UUID userId = currentUserId(); // Use the existing SecuredService method
+        UUID userId = currentUserId();
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 

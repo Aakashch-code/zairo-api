@@ -22,7 +22,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     Optional<Transaction> findByIdAndWorkspaceId(Long id, UUID workspaceId);
 
     @Query("SELECT t FROM Transaction t WHERE t.workspace.id = :workspaceId AND LOWER(t.category) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    Page<Transaction> searchByWorkspaceIdAndKeyword(@Param("workspaceId") UUID workspaceId, @Param("keyword") String keyword, Pageable pageable);
+    Page<Transaction> searchByWorkspaceIdAndKeyword(@Param("workspaceId") UUID wosrkspaceId, @Param("keyword") String keyword, Pageable pageable);
 
     @Query("""
         SELECT COALESCE(SUM(t.amount), 0)

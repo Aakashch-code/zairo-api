@@ -2,6 +2,7 @@ package org.example.zairo.authentication.infrastructure.persistence;
 
 import org.example.zairo.authentication.application.dto.UserSummaryDTO;
 import org.example.zairo.authentication.domain.model.Users;
+import org.example.zairo.authentication.domain.model.UsersRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,4 +32,6 @@ public interface UserRepository extends JpaRepository<Users, UUID> {
         WHERE u.workspace.id = :workspaceId
     """)
     List<UserSummaryDTO> findUserSummariesByWorkspaceId(@Param("workspaceId") UUID workspaceId);
+
+    Optional<Users> findByWorkspaceIdAndRole(UUID workspaceId, UsersRole role);
 }

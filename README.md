@@ -1,61 +1,59 @@
 # Zairo — Financial Workspace API
 
-> A backend REST API for teams that need clarity — not chaos — around money.
+A backend REST API for teams that need clarity around financial data. Zairo provides granular role-based access control, allowing viewers to see numbers, analysts to pull reports, and admins to manage data.
 
-Most finance tools either lock everyone out or let everyone in. Zairo does both — granularly. A viewer can see the numbers. An analyst can pull reports. Only admins touch the data.
-
-Built with Spring Boot 3, JWT auth, and PostgreSQL on Neon.
+Built with Spring Boot 3, JWT authentication, and PostgreSQL on Neon.
 
 ---
 
-## Why it's built this way
+## Why This Design
 
-**Roles over flags** — 4 roles map to real team structures, not arbitrary booleans.
+**Role-based access** — Four roles map to real team structures, not arbitrary permission flags.
 
-**JWT, not sessions** — Stateless auth scales horizontally without sticky sessions.
+**Stateless authentication** — JWT tokens enable horizontal scaling without sticky sessions.
 
-**PDF export as a first-class feature** — Finance teams live in reports. Export isn't an afterthought.
+**PDF exports by default** — Finance teams work with reports. Export is a first-class feature, not an afterthought.
 
-**Neon for the database** — Serverless Postgres so you get a real DB without managing infra.
+**Serverless database** — Neon PostgreSQL eliminates infrastructure management while maintaining a production-grade relational database.
 
 ---
 
 ## Tech Stack
 
-| Layer     | Technology                  |
-|-----------|-----------------------------|
-| Language  | Java 21                     |
-| Framework | Spring Boot 3.x             |
-| Security  | Spring Security + JWT       |
-| Database  | PostgreSQL (hosted on Neon) |
-| ORM       | Spring Data JPA / Hibernate |
-| Docs      | Swagger / OpenAPI 3         |
-| Build     | Maven                       |
+| Layer | Technology |
+|-------|------------|
+| Language | Java 21 |
+| Framework | Spring Boot 3.x |
+| Security | Spring Security + JWT |
+| Database | PostgreSQL (Neon) |
+| ORM | Spring Data JPA / Hibernate |
+| Documentation | Swagger / OpenAPI 3 |
+| Build Tool | Maven |
 
 ---
 
-## Who can do what
+## Role Permissions
 
-| Action                    | Viewer | Analyst | Admin | Organizer |
-|---------------------------|:------:|:-------:|:-----:|:---------:|
-| View & filter transactions | ✓      | ✓       | ✓     | ✓         |
-| View net position          | ✓      | ✓       | ✓     | ✓         |
-| Export PDF report          |        | ✓       | ✓     | ✓         |
-| Create / edit / delete     |        |         | ✓     | ✓         |
-| Manage workspace users     |        |         | ✓     | ✓         |
+| Action | Viewer | Analyst | Admin | Organizer |
+|--------|:------:|:-------:|:-----:|:---------:|
+| View and filter transactions | X | X | X | X |
+| View net position | X | X | X | X |
+| Export PDF reports | | X | X | X |
+| Create, edit, delete records | | | X | X |
+| Manage workspace users | | | X | X |
 
 ---
 
-## Get running in 3 steps
+## Quick Start
 
-### 1. Clone & configure
+### 1. Clone and configure
 
 ```bash
 git clone https://github.com/Aakashch-code/zairo-api
 cd zairo
 ```
 
-Edit `src/main/resources/application.properties`:
+Update `src/main/resources/application.properties`:
 
 ```properties
 spring.datasource.url=jdbc:postgresql://<your-db-host>/neondb
@@ -74,13 +72,13 @@ server.port=8085
 mvn spring-boot:run
 ```
 
-Runs on `http://localhost:8085`. Hibernate auto-creates the schema on first run.
+The server runs on `http://localhost:8085`. Hibernate auto-creates the database schema on first run.
 
 ### 3. Explore the API
 
-Open Swagger UI: `http://localhost:8085/swagger-ui/index.html`
+Open Swagger UI at `http://localhost:8085/swagger-ui/index.html`
 
-Login → grab the JWT → authenticate every subsequent request:
+Log in, retrieve your JWT token, and include it in subsequent requests:
 
 ```
 Authorization: Bearer <your-token>
@@ -88,26 +86,40 @@ Authorization: Bearer <your-token>
 
 ---
 
-## Core endpoints
+## API Endpoints
+
+### Authentication
 
 ```
 POST   /api/auth/register              Register a new user
-POST   /api/auth/login                 Login → receive JWT
+POST   /api/auth/login                 Login and receive JWT token
+```
 
-GET    /api/transactions               Paginated list (all roles)
-GET    /api/transactions/net           Income vs expenses (all roles)
+### Transactions
+
+```
+GET    /api/transactions               List transactions (paginated, all roles)
+GET    /api/transactions/net           View net income vs expenses (all roles)
 POST   /api/transactions/filter        Filter by date, category, amount (all roles)
-GET    /api/transactions/pdf           Export report (analyst+)
+GET    /api/transactions/pdf           Export financial report (analyst+)
 POST   /api/transactions               Create transaction (admin/organizer)
 PUT    /api/transactions/{id}          Update transaction (admin/organizer)
 DELETE /api/transactions/{id}          Delete transaction (admin/organizer)
+```
 
-GET    /api/auth/workspace/users       List workspace users (admin/organizer)
+### User Management
+
+```
+GET    /api/auth/workspace/users       List workspace members (admin/organizer)
 PUT    /api/auth/{userId}              Update user credentials (admin/organizer)
 DELETE /api/auth/{userId}              Remove user (admin/organizer)
 ```
 
-### Example: Login
+---
+
+## Request Examples
+
+### Login
 
 ```http
 POST /api/auth/login
@@ -119,13 +131,15 @@ Content-Type: application/json
 }
 ```
 
+Response:
+
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6..."
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
 
-### Example: Create a transaction
+### Create a transaction
 
 ```http
 POST /api/transactions
@@ -143,20 +157,20 @@ Content-Type: application/json
 
 ---
 
-## Project structure
+## Project Structure
 
 ```
 src/
 ├── main/
 │   ├── java/org/example/zairo/
 │   │   ├── authentication/
-│   │   │   ├── api/            # Auth controllers
-│   │   │   ├── application/    # DTOs, services
-│   │   │   └── domain/         # User model
+│   │   │   ├── api/                # Auth controllers
+│   │   │   ├── application/        # DTOs, services
+│   │   │   └── domain/             # User entity
 │   │   └── transaction/
-│   │       ├── api/            # Transaction controllers
-│   │       ├── application/    # DTOs, services, filters
-│   │       └── infrastructure/ # PDF export
+│   │       ├── api/                # Transaction controllers
+│   │       ├── application/        # DTOs, services, filtering logic
+│   │       └── infrastructure/     # PDF export
 │   └── resources/
 │       └── application.properties
 ```
@@ -165,14 +179,25 @@ src/
 
 ## Prerequisites
 
-- Java 17+
-- Maven 3.8+
-- PostgreSQL database — local or cloud ([Neon](https://neon.tech) recommended)
+- Java 21 or later
+- Maven 3.8 or later
+- PostgreSQL database (local or cloud instance via Neon)
+
+---
+
+## Configuration
+
+All configuration is managed via `application.properties`. Key settings:
+
+- `spring.datasource.url` — PostgreSQL connection string
+- `application.security.jwt.secret-key` — JWT signing key (minimum 32 characters)
+- `application.security.jwt.expiration` — Token expiration in milliseconds
+- `server.port` — Server port (default 8085)
 
 ---
 
 ## License
 
-Open for learning and portfolio purposes.
+Open for learning and portfolio use.
 
-*Built by [Aakash Chauhan](https://github.com/Aakashch-code)*
+Built by Aakash Chauhan — [GitHub](https://github.com/Aakashch-code)

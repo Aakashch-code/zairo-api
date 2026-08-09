@@ -1,4 +1,4 @@
-package org.example.zairo.authentication.application.exception;
+package org.example.zairo.authentication.domain.exception;
 
 public class BadRequestException extends RuntimeException {
     public BadRequestException(String message) {

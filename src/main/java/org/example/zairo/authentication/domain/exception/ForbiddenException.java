@@ -1,4 +1,4 @@
-package org.example.zairo.authentication.application.exception;
+package org.example.zairo.authentication.domain.exception;
 
 public class ForbiddenException extends RuntimeException{
     public ForbiddenException(String message) {

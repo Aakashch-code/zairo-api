@@ -1,11 +1,11 @@
 package org.example.zairo.authentication.application.service;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.example.zairo.authentication.application.dto.*;
-import org.example.zairo.authentication.application.exception.BadRequestException;
-import org.example.zairo.authentication.application.exception.ForbiddenException;
-import org.example.zairo.authentication.application.exception.NotFoundException;
-import org.example.zairo.authentication.application.exception.UnauthorizedException;
+import org.example.zairo.authentication.domain.exception.BadRequestException;
+import org.example.zairo.authentication.domain.exception.ForbiddenException;
+import org.example.zairo.authentication.domain.exception.NotFoundException;
 import org.example.zairo.authentication.domain.model.FinanceWorkspace;
 import org.example.zairo.authentication.domain.model.Users;
 import org.example.zairo.authentication.domain.model.UsersRole;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class AuthService {
 
     private final UserRepository repo;
@@ -69,9 +69,12 @@ public class AuthService {
         repo.save(user);
 
         if (request.getRole() == UsersRole.ORGANIZER) {
-            return "Organizer registered. Invite code: " + workspace.getInviteCode();
+            return """
+            Organizer registered successfully.
+            Invite code: %s
+            Please save it for future use.
+            """.formatted(workspace.getInviteCode());
         }
-
         return "User registered successfully";
     }
 
